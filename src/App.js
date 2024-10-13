@@ -1,9 +1,10 @@
 import './App.css';
 import UserTable from './component/UserTable';
+import users from './component/data'
 
 function App() {
   return (
-  <div><UserTable/></div>
+  <div><UserTable usersObject={users}/></div>
   );
 }
 

@@ -1,62 +1,162 @@
-import React, { useState, useEffect } from 'react';
-import { Table, TableContainer, TableHead, TableBody, TableRow, TableCell, Paper, Button } from   
- '@mui/material';
-import userData from './data' 
+import React, { useState, useEffect, useRef } from 'react';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress  } from '@mui/material';
+import UserData from './users';
+import PaginationControls from './paginationControls';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import SearchBar from './SearchBar';
 
-function UserTable() {
-  const [users, setUsers] = useState(() => {
-    if (userData) {
-      return userData; // Use mock data if the condition is true
-    } else {
-      return []; // Use an empty array if the condition is false
+function UserTable({ usersObject }) {
+  const [users, setUsers] = useState(usersObject || []);
+  const usersPerPage = 5; // Total users per page (for pagination)
+  const [loadedUsers, setLoadedUsers] = useState(usersPerPage); // Infinite scroll initially loads usersPerPage
+  const [currentPage, setCurrentPage] = useState(1); // Pagination current page
+  const containerRef = useRef(null);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(''); // Search state
+  const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'ascending' }); // Sorting state: default sort by 'name' in 'ascending' direction
+
+  const prevClick = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
     }
-  });
+  };
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const nextClick = () => {
+    const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
-  const indexOfLastUser = currentPage * usersPerPage;
-  const indexOfFirstUser = indexOfLastUser - usersPerPage;
-  const   
-  currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+  // Filtering users based on search term
+  const filteredUsers = users.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  // Sorting function
+  const sortedUsers = () => {
+    const sortedArray = [...filteredUsers].sort((a, b) => {
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'ascending' ? 1 : -1;
+      }
+      return 0;
+    });
+    return sortedArray;
+  };
+
+  // Handle infinite scrolling and load more users
+  const loadMoreUsers = () => {
+    if (loading || loadedUsers >= filteredUsers.length) return; // Stop if already loading or no more users to load
+
+    setLoading(true);
+    setTimeout(() => {
+      setLoadedUsers(prev => prev + usersPerPage); // Increase the users loaded on scroll by usersPerPage
+      setCurrentPage(prev => prev + 1, totalPages)
+      setLoading(false);
+    }, 1000); // Simulate a network delay
+  };
+
+  // Scroll event listener for infinite scroll
+  const handleScroll = () => {
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    if (scrollTop + clientHeight >= scrollHeight - 5) {
+      loadMoreUsers(); // Load more users when scrolling to the bottom
+    }
+  };
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener('scroll', handleScroll);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [loading, filteredUsers.length]);
+
+  // Handle sorting on table headers
+  const handleSort = (key) => {
+    let direction = 'ascending';
+    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
+      direction = 'descending';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  // Handle manual page change for pagination
+  const handlePageChange = (pageNum) => {
+    setCurrentPage(pageNum);
+    setLoadedUsers(usersPerPage); // Reset loaded users when page changes
+  };
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage); // total pages for pagination
+
+  // Get the users for the current page based on sorting and filtering
+  const startIndex = (currentPage - 1) * usersPerPage;
+  const currentUsers = sortedUsers().slice(startIndex, startIndex + loadedUsers);
+  console.log({currentUsers});
 
   return (
-    <TableContainer component={Paper}>
-      <Table aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell>userId</TableCell>
-            <TableCell>Name</TableCell> 
-            <TableCell>Email</TableCell>
-            <TableCell>Role</TableCell>
-          </TableRow>
-        </TableHead>
-        {users && <UserData users={currentUsers}/>}
-      </Table>
-      <div>
-        <Button variant="contained" color="primary" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Previous</Button>
-        <Button variant="contained" color="primary" onClick={() => paginate(currentPage + 1)} disabled={currentPage === Math.ceil(users.length / usersPerPage)}>Next</Button>
-      </div>
-    </TableContainer>
+    <div style={{ maxWidth: '1000px', margin: 'auto' }}>
+      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
+      <TableContainer
+        component={Paper}
+        ref={containerRef}
+        style={{ maxHeight: '320px', overflowY: 'scroll', overflowX: 'hidden' }}
+      >
+        <Table aria-label="user table">
+          <TableHead>
+            <TableRow>
+              <TableCell>S.No</TableCell>
+              <TableCell>userId</TableCell>
+              <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
+                Name
+                <ArrowUpward fontSize="small" />
+                <ArrowDownward fontSize="small" />
+              </TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell onClick={() => handleSort('role')} style={{ cursor: 'pointer' }}>
+                Role
+                <ArrowUpward fontSize="small" />
+                <ArrowDownward fontSize="small" />
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentUsers.length > 0 ? (
+              <UserData users={currentUsers}/>): (
+              <TableRow>
+                <TableCell colSpan={5}>No users found</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {loading && (
+          <div style={{ textAlign: 'center', padding: '10px' }}>
+            <CircularProgress size={24} />
+            <p>Loading more users...</p>
+          </div>
+        )}
+      </TableContainer>
+
+      {/* Pagination Controls */}
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageSelect={handlePageChange}
+        onPrevClick={prevClick}
+        onNextClick={nextClick}
+      />
+    </div>
   );
 }
 
-const UserData = ({users}) => {
-    console.log("users", users);
-  return (
-    <TableBody>
-      {users.map((user) => (
-        <TableRow key={user.id}>
-          <TableCell>{user.userId}</TableCell>
-          <TableCell>{user.name}</TableCell>
-          <TableCell>{user.email}</TableCell>
-          <TableCell>{user.role}</TableCell>
-        </TableRow>
-      ))}
-    </TableBody>
-  );
-};
+export default UserTable;
 
-export default UserTable;   
