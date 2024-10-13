@@ -1,16 +1,41 @@
-import React from 'react';
 import { TextField } from '@mui/material';
 
 const SearchBar = ({ searchTerm, setSearchTerm }) => {
   return (
-    <TextField
-      label="Search by Name or Email"
-      variant="outlined"
-      fullWidth
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-      style={{ marginBottom: '16px' }} // Add some margin for spacing
-    />
+    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <TextField
+        variant="outlined"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        sx={{
+          width: '220px', 
+          marginBottom: '16px',
+          marginTop: '24px',
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 0,
+            borderBottom: '1.5px solid #000',
+            paddingBottom: '4px',
+            transition: 'border-bottom 0.3s ease',
+          },
+          '& .MuiOutlinedInput-root.Mui-focused': {
+            borderBottom: '1.5px solid #1976d2',
+          },
+          '& .MuiOutlinedInput-notchedOutline': {
+            border: 'none',
+          },
+          '& input::placeholder': {
+            color: '#000',
+            fontStyle: 'italic',
+          },
+          '& .MuiInputBase-input': {
+            paddingBottom: '4px',
+          },
+        }}
+        InputProps={{
+          placeholder: 'Search by Name or Email',
+        }}
+      />
+    </div>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress  } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, CircularProgress} from '@mui/material';
 import UserData from './users';
 import PaginationControls from './paginationControls';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
@@ -100,51 +100,65 @@ function UserTable({ usersObject }) {
   // Get the users for the current page based on sorting and filtering
   const startIndex = (currentPage - 1) * usersPerPage;
   const currentUsers = sortedUsers().slice(startIndex, startIndex + loadedUsers);
-  console.log({currentUsers});
 
   return (
     <div style={{ maxWidth: '1000px', margin: 'auto' }}>
       <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-      <TableContainer
-        component={Paper}
-        ref={containerRef}
-        style={{ maxHeight: '320px', overflowY: 'scroll', overflowX: 'hidden' }}
-      >
-        <Table aria-label="user table">
-          <TableHead>
-            <TableRow>
-              <TableCell>S.No</TableCell>
-              <TableCell>userId</TableCell>
-              <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer' }}>
-                Name
-                <ArrowUpward fontSize="small" />
-                <ArrowDownward fontSize="small" />
-              </TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell onClick={() => handleSort('role')} style={{ cursor: 'pointer' }}>
-                Role
-                <ArrowUpward fontSize="small" />
-                <ArrowDownward fontSize="small" />
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {currentUsers.length > 0 ? (
-              <UserData users={currentUsers}/>): (
+      <div style={{ overflowX: 'auto' }}>
+        <TableContainer
+          component={Paper}
+          ref={containerRef}
+          style={{ maxHeight: '320px', overflowY: 'scroll', overflowX: 'auto', borderBottom: '1px solid #ccc' , borderTop: '1px solid #ccc'  }}
+        >
+          <Table aria-label="user table" style={{ tableLayout: 'fixed', width: '100%' }}>
+            <TableHead style={{background: '#3652AD', color: 'white'}}>
               <TableRow>
-                <TableCell colSpan={5}>No users found</TableCell>
+                <TableCell style={{ width: '30px', minWidth: '30px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>S.No</TableCell>
+                <TableCell style={{ width: '140px', minWidth: '140px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>User Id</TableCell>
+                <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer', width: '220px', minWidth: '200px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>
+                  Name
+                  <ArrowUpward
+                    fontSize="small"
+                    sx={{ marginLeft: '2px', marginBottom: '-5px', color: '#fff' }}
+                  />
+                  <ArrowDownward
+                    fontSize="small"
+                    sx={{ marginLeft: '-4px', marginBottom: '-5px', color: '#fff' }}
+                  />
+                </TableCell>
+                <TableCell style={{ width: '200px', minWidth: '180px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>Email</TableCell>
+                <TableCell onClick={() => handleSort('role')} style={{ cursor: 'pointer', width: '220px', minWidth: '200px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>
+                  Role
+                  <ArrowUpward
+                    fontSize="small"
+                    sx={{ marginLeft: '2px', marginBottom: '-5px', color: '#fff' }}
+                  />
+                  <ArrowDownward
+                    fontSize="small"
+                    sx={{ marginLeft: '-4px', marginBottom: '-5px', color: '#fff' }}
+                  />
+                </TableCell>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '10px' }}>
-            <CircularProgress size={24} />
-            <p>Loading more users...</p>
-          </div>
-        )}
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {currentUsers.length > 0 ? (
+                <UserData users={currentUsers} startIndex={startIndex} />
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} style={{ textAlign: 'center' }}>No users found</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '10px' }}>
+              <CircularProgress size={24} />
+              <p>Loading more users...</p>
+            </div>
+          )}
+        </TableContainer>
+      </div>
 
       {/* Pagination Controls */}
       <PaginationControls

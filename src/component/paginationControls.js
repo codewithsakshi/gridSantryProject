@@ -28,13 +28,14 @@ function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick,
   };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px', maxWidth: '400px', margin: 'auto', paddingTop: '20px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px', maxWidth: '400px', margin: 'auto', paddingTop: '40px' }}>
       <Button 
         className='prev-btn' 
         variant="contained" 
         color="primary" 
         onClick={onPrevClick} 
         disabled={currentPage === 1}
+        style={{ minwidth: '90px', borderRadius: 0, fontSize: '12px', padding: '5px 10px' }}  // Reduced width and font size
       >
         Previous
       </Button>
@@ -47,6 +48,7 @@ function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick,
         color="primary" 
         onClick={onNextClick} 
         disabled={currentPage === totalPages}
+        style={{ minwidth: '90px', borderRadius: 0, fontSize: '12px', padding: '5px 10px'  }}  // Reduced width and font size
       >
         Next
       </Button>
@@ -62,11 +64,6 @@ function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick,
         onKeyPress={handleKeyPress}  /* Trigger pagination on Enter */
         style={{ width: '80px', marginLeft: '10px' }}
       />
-
-      {/* Loading message */}
-      {/* {loading && loadedUsers < totalUsers && (
-        <span style={{ marginLeft: '10px' }}>Loading more users...</span>
-      )} */}
     </div>
   );
 }
