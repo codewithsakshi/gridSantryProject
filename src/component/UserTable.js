@@ -4,8 +4,21 @@ import UserData from './users';
 import PaginationControls from './paginationControls';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import SearchBar from './SearchBar';
+import { makeStyles } from "@mui/styles";  
+
+const useStyles = makeStyles(() => ({
+  column: {
+    textAlign: 'center!important',
+    border: '1px solid #ccc',
+    color: 'white!important',
+    cursor: 'pointer'
+  },
+}));
+
 
 function UserTable({ usersObject }) {
+  const classes = useStyles();
+
   const [users, setUsers] = useState(usersObject || []);
   const usersPerPage = 5; // Total users per page (for pagination)
   const [loadedUsers, setLoadedUsers] = useState(usersPerPage); // Infinite scroll initially loads usersPerPage
@@ -29,10 +42,10 @@ function UserTable({ usersObject }) {
   };
 
   // Filtering users based on search term
-  const filteredUsers = users.filter(user =>
+  const filteredUsers = Array.isArray(users) ? users.filter(user =>
     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  ) : [];
 
   // Sorting function
   const sortedUsers = () => {
@@ -57,7 +70,7 @@ function UserTable({ usersObject }) {
       setLoadedUsers(prev => prev + usersPerPage); // Increase the users loaded on scroll by usersPerPage
       setCurrentPage(prev => prev + 1, totalPages)
       setLoading(false);
-    }, 1000); // Simulate a network delay
+    }, 1000);
   };
 
   // Scroll event listener for infinite scroll
@@ -114,9 +127,9 @@ function UserTable({ usersObject }) {
           <Table aria-label="user table" style={{ tableLayout: 'fixed', width: '100%' }}>
             <TableHead style={{background: '#3652AD', color: 'white'}}>
               <TableRow>
-                <TableCell style={{ width: '30px', minWidth: '30px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>S.No</TableCell>
-                <TableCell style={{ width: '140px', minWidth: '140px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>User Id</TableCell>
-                <TableCell onClick={() => handleSort('name')} style={{ cursor: 'pointer', width: '220px', minWidth: '200px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>
+                <TableCell style={{ width: '30px', minWidth: '30px'}} className={classes.column}>S.No</TableCell>
+                <TableCell style={{ width: '140px', minWidth: '140px'}} className={classes.column}>User Id</TableCell>
+                <TableCell onClick={() => handleSort('name')} style={{width: '220px', minWidth: '200px'}} className={classes.column}>
                   Name
                   <ArrowUpward
                     fontSize="small"
@@ -127,8 +140,8 @@ function UserTable({ usersObject }) {
                     sx={{ marginLeft: '-4px', marginBottom: '-5px', color: '#fff' }}
                   />
                 </TableCell>
-                <TableCell style={{ width: '200px', minWidth: '180px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>Email</TableCell>
-                <TableCell onClick={() => handleSort('role')} style={{ cursor: 'pointer', width: '220px', minWidth: '200px', textAlign: 'center', border: '1px solid #ccc', color: 'white' }}>
+                <TableCell style={{ width: '200px', minWidth: '180px'}} className={classes.column}>Email</TableCell>
+                <TableCell onClick={() => handleSort('role')} style={{width: '220px', minWidth: '200px'}} className={classes.column}>
                   Role
                   <ArrowUpward
                     fontSize="small"
@@ -160,7 +173,6 @@ function UserTable({ usersObject }) {
         </TableContainer>
       </div>
 
-      {/* Pagination Controls */}
       <PaginationControls
         currentPage={currentPage}
         totalPages={totalPages}

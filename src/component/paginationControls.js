@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Button, TextField } from '@mui/material';
+import { makeStyles } from "@mui/styles";
+
+const useStyles = makeStyles(() => ({
+  button: {
+    minwidth: '90px', 
+    borderRadius: 0, 
+    fontSize: '12px', 
+    padding: '5px 10px'
+  },
+}));
 
 function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick, loading, loadedUsers, totalUsers, onPageSelect }) {
+  const classes = useStyles();
   const [pageInput, setPageInput] = useState(currentPage);
 
   useEffect(() => {
@@ -30,12 +41,11 @@ function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick,
   return (
     <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px', maxWidth: '400px', margin: 'auto', paddingTop: '40px' }}>
       <Button 
-        className='prev-btn' 
+        className={`${classes.button} prev-btn`}
         variant="contained" 
         color="primary" 
         onClick={onPrevClick} 
         disabled={currentPage === 1}
-        style={{ minwidth: '90px', borderRadius: 0, fontSize: '12px', padding: '5px 10px' }}  // Reduced width and font size
       >
         Previous
       </Button>
@@ -43,12 +53,11 @@ function PaginationControls({ currentPage, totalPages, onPrevClick, onNextClick,
         Page {currentPage} of {totalPages}
       </span>
       <Button 
-        className='next-btn' 
+        className={`${classes.button} next-btn`}
         variant="contained" 
         color="primary" 
         onClick={onNextClick} 
         disabled={currentPage === totalPages}
-        style={{ minwidth: '90px', borderRadius: 0, fontSize: '12px', padding: '5px 10px'  }}  // Reduced width and font size
       >
         Next
       </Button>
