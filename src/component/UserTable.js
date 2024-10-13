@@ -22,7 +22,7 @@ function UserTable({ usersObject }) {
   const [users, setUsers] = useState(usersObject || []);
   const usersPerPage = 5; // Total users per page (for pagination)
   const [loadedUsers, setLoadedUsers] = useState(usersPerPage); // Infinite scroll initially loads usersPerPage
-  const [currentPage, setCurrentPage] = useState(1); // Pagination current page
+  let [currentPage, setCurrentPage] = useState(1); // Pagination current page
   const containerRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState(''); // Search state
@@ -112,7 +112,11 @@ function UserTable({ usersObject }) {
 
   // Get the users for the current page based on sorting and filtering
   const startIndex = (currentPage - 1) * usersPerPage;
-  const currentUsers = sortedUsers().slice(startIndex, startIndex + loadedUsers);
+  const lastIndex = startIndex + loadedUsers;
+  if(currentPage > totalPages){
+    currentPage = 1;
+  }
+  const currentUsers = (sortedUsers()[startIndex] && sortedUsers()[lastIndex]) ? sortedUsers().slice(startIndex, lastIndex) : sortedUsers();
 
   return (
     <div style={{ maxWidth: '1000px', margin: 'auto' }}>
